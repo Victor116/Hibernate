@@ -33,22 +33,29 @@ public class PruenaInsersion {
         
         /* Actividad 3_1 Persistencia Hibernate 1/2*/
         addAlumnoConCiudad(); /* Crear e insertar alumnos */
+        listAlumnos();
+                
         listAlumnosPorCiudad(4); /* Traer Alumnos pertenecientes a una ciudad */
+        
         listAlumnos20Anios(); /* Trae Alumnos menores a 20 años de edad */ 
         
         /* Actividad 3_1 Persistencia Hibernate 2/2*/
         insertAlumno("Batman", "M", 33, "La Baticueva");/* Ingresamos un nuevo Alumno */
+        insertAlumno("Yu-Gi-Oh", "M", 18, "Desierto");/* Ingresamos un nuevo Alumno */
         listAlumnos();
         
-        updateAlumno(8, "Barbie", "F", 20,"Coita"); /* Actualizar un Alumno */
+        updateAlumno(3, "Barbie", "F", 20,"Coita"); /* Actualizar un Alumno */
         listAlumnos();
         
-        deleteAlumno(9); /* Eliminar un Alumno */
+        deleteAlumno(8); /* Eliminar un Alumno */
+        listAlumnos();
         
     }
     
     /* Crea nuevos alumnos */
-    public static void addAlumnoConCiudad(){        
+    public static void addAlumnoConCiudad(){     
+        
+        System.err.println("Añadiendo Alumnos" );
         Session session = factory.openSession();
         Transaction tx = null;
         Integer daoID = null;
@@ -78,6 +85,7 @@ public class PruenaInsersion {
     
     /* Lista Alumnos dependiendo el id de una ciudad */
     public static void listAlumnosPorCiudad(int idCiudad) {
+        System.err.println("Listado de Alumnos pertenecientes a una Ciudad" );
         Session session = factory.openSession();
         Transaction tx = null;
         try {
@@ -101,6 +109,7 @@ public class PruenaInsersion {
     
     /* Listar Alumnos menores a 20 años de edad */
     public static void listAlumnos20Anios() {
+        System.err.println("Listado de Alumnos menores de 20 años de edad" );
         Session session = factory.openSession();
         Transaction tx = null;
         try {
@@ -126,16 +135,17 @@ public class PruenaInsersion {
     
     /*Insertar un solo alumno*/
     public static void insertAlumno(String nombre, String sexo, int edad, String ciudad){
+        System.err.println("Insertar un Alumno" );
         Session session = factory.openSession();
         Transaction tx = null;
-        Integer daoID = null;
         try{
             tx = session.beginTransaction();
             Ciudad ciudad2 = new Ciudad( ciudad );
             Alumno alumno = new Alumno( nombre, sexo, edad, ciudad2 );
-
-            session.save(alumno);
-        tx.commit();
+            
+            session.save(alumno); 
+            System.out.println("Se añadio al Alumno: "+ nombre);
+            tx.commit();
         }catch (HibernateException e) {
            if (tx!=null) tx.rollback();
         }finally {
@@ -145,6 +155,7 @@ public class PruenaInsersion {
     
     /* Obtiene todos los alumnos */
     public static void listAlumnos( ){
+        System.err.println("Listado de Alumnos existentes" );
         Session session = factory.openSession();
         Transaction tx = null;
         try{
@@ -167,19 +178,23 @@ public class PruenaInsersion {
     }
     
     /* Actualiza la edad*/
-    public static void updateAlumno( Integer AlumnoID, String nombre, String sexo, int edad, String city ){
+    public static void updateAlumno( long AlumnoID, String nombre, String sexo, int edad, String city ){
+        System.err.println("Actualizacion de un Alumno" );
         Session session = factory.openSession();
         Transaction tx = null;
+
         try{
             tx = session.beginTransaction();
             
             Ciudad ciudad = new Ciudad( city );
-            Alumno dao = (Alumno)session.get(Alumno.class, AlumnoID); 
+            Alumno dao = (Alumno)session.get(Alumno.class, AlumnoID);
+            String name = dao.getAlumnoName();
             dao.setAlumnoName( nombre );
             dao.setAlumnoSexo( sexo );
             dao.setAlumnoEdad( edad );
-            dao.setAlumnoCiudad(ciudad);
-            session.update(dao); 
+            dao.setAlumnoCiudad( ciudad );
+            session.update(dao);
+            System.out.println("Se actulizaron los del Alumno: "+ name +" a "+ nombre);
 
             tx.commit();
         }catch (HibernateException e) {
@@ -190,13 +205,15 @@ public class PruenaInsersion {
     }
     
     /* Borra alumno */
-    public static void deleteAlumno(Integer AlumnoID){
+    public static void deleteAlumno(long AlumnoID){
+        System.err.println("Eliminacion de un Alumno" );
         Session session = factory.openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
             Alumno dao = (Alumno)session.get(Alumno.class, AlumnoID); 
             session.delete(dao); 
+            System.out.println("Se elimino al Alumno: "+ dao.getAlumnoName());
             tx.commit();
         }catch (HibernateException e) {
             if (tx!=null) tx.rollback();
